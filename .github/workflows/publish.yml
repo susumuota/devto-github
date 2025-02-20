@@ -14,17 +14,16 @@ name: publish
 on:
   push:
     branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
 
 jobs:
   publish:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2
-    - uses: actions/setup-node@v1
-      with:
-        node-version: 14
-
+    - uses: actions/checkout@v4
     - name: Publish articles on dev.to
       uses: sinedied/publish-devto@v2
       with:
@@ -43,3 +42,8 @@ jobs:
         # (Optional) Use conventional commit messages. Default is false.
         # See https://www.conventionalcommits.org.
         conventional_commits: true
+        # (Optional) Do not make actual changes on dev.to if it's a pull request.
+        dry_run: ${{ github.event_name == 'pull_request' }}
+      env:
+        GIT_COMMITTER_NAME: S. Ota
+        GIT_COMMITTER_EMAIL: 1632335+susumuota@users.noreply.github.com
