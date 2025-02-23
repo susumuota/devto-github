@@ -2,7 +2,7 @@
 title: Faster and More Reliable Hugging Face Downloads Using aria2 and GNU Parallel
 description: 'This guide offers step-by-step techniques, configuration tips, and practical examples to streamline your workflow for downloading machine learning models and datasets.'
 tags: 'huggingface, llm, python, ai'
-cover_image: ''
+cover_image: './hf-logo.png'
 canonical_url: null
 published: false
 id: 2294102
