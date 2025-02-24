@@ -1,6 +1,6 @@
 ---
 title: Faster and More Reliable Hugging Face Downloads Using aria2 and GNU Parallel
-description: 'This guide offers step-by-step techniques, configuration tips, and practical examples to streamline your workflow for downloading machine learning models and datasets.'
+description: 'This guide offers step-by-step instructions on how to speed up and improve the reliability of your Hugging Face downloads using two powerful command-line tools: aria2 and GNU Parallel.'
 tags: 'huggingface, llm, python, ai'
 cover_image: ./hf-logo-1000-400.png
 canonical_url: null
@@ -16,7 +16,7 @@ id: 2294102
 
 ## Introduction
 
-Downloading machine learning models and datasets from Hugging Face is time-consuming and unreliable. It is especially slow when dealing with large files or slow internet connections. Follow this guide to speed up and improve the reliability of your Hugging Face downloads using two powerful command-line tools: `aria2` and `GNU Parallel`.
+Downloading machine learning models and datasets from Hugging Face is time-consuming and unreliable. It is especially slow when dealing with large files or unstable internet connections. Follow this guide to speed up and improve the reliability of your Hugging Face downloads using two powerful command-line tools: `aria2` and `GNU Parallel`.
 
 ## Prerequisites
 
@@ -161,10 +161,30 @@ time find . -name "*.sha256" | sort | parallel -j 8 -u "sha256sum -c {} 2>&1" | 
 # model-00003-of-00010.safetensors: OK
 # model-00002-of-00010.safetensors: OK
 # ...
-
-wc -l sha256sum.log  # 13 sha256sum.log
-sort sha256sum.log | nl | less  # should be all OK
 ```
+
+Let's check the contents of the file `sha256sum.log`. It should contain the results of the SHA256 hash verification for each file. The `OK` message indicates that the hash verification was successful.
+
+```bash
+wc -l sha256sum.log  # 13 sha256sum.log
+
+sort sha256sum.log | nl
+#      1  consolidated.safetensors: OK
+#      2  model-00001-of-00010.safetensors: OK
+#      3  model-00002-of-00010.safetensors: OK
+#      4  model-00003-of-00010.safetensors: OK
+#      5  model-00004-of-00010.safetensors: OK
+#      6  model-00005-of-00010.safetensors: OK
+#      7  model-00006-of-00010.safetensors: OK
+#      8  model-00007-of-00010.safetensors: OK
+#      9  model-00008-of-00010.safetensors: OK
+#     10  model-00009-of-00010.safetensors: OK
+#     11  model-00010-of-00010.safetensors: OK
+#     12  tekken.json: OK
+#     13  tokenizer.json: OK
+```
+
+OK! All the files have been successfully downloaded and verified!
 
 ## Conclusion
 
