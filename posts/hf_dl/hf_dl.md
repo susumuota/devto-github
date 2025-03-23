@@ -4,8 +4,9 @@ description: 'This guide offers step-by-step instructions on how to speed up and
 tags: 'huggingface, llm, python, ai'
 cover_image: ./hf-logo-1000-400.png
 canonical_url: null
-published: false
+published: true
 id: 2294102
+date: '2025-03-23T04:16:34Z'
 ---
 
 ## Summary
@@ -54,23 +55,24 @@ conda install conda-forge::git-lfs conda-forge::aria2 conda-forge::parallel -y
 
 ## Downloading Hugging Face Models
 
-In this section, we will see how to download Hugging Face models (e.g. `mistralai/Mistral-Small-24B-Instruct-2501`) using `aria2`.
+In this section, we will see how to download Hugging Face models (e.g. `Qwen/Qwen2.5-72B`) using `aria2`.
 
 First, let's clone a Hugging Face repository using `git`. To avoid downloading the large files, we set the `GIT_LFS_SKIP_SMUDGE` environment variable to `1`.
 
 ```bash
-GIT_LFS_SKIP_SMUDGE=1 git clone https://huggingface.co/mistralai/Mistral-Small-24B-Instruct-2501
-cd Mistral-Small-24B-Instruct-2501
+GIT_LFS_SKIP_SMUDGE=1 git clone https://huggingface.co/Qwen/Qwen2.5-72B
+cd Qwen2.5-72B
 ```
 
 The `git lfs ls-files` command lists the files tracked by `git-lfs`. With the `-l` option it will show the OID (SHA256 hash) and the filename. We will use this information to download the files using `aria2` and to verify the SHA256 hashes.
 
 ```bash
 git lfs ls-files -l
-# 82718244a767b5b3545a46736801a0dfbdc4aacb581f7cfd9c08a2bdfdd4333e - consolidated.safetensors
-# 75a14c708eea501700a723dc74bc886cf36a1393686a3fb098ee106b160da32f - model-00001-of-00010.safetensors
-# 1ff40fbfd9e042b7dab3f3c9442f870a4701f53e394dda769807a160ba40f32a - model-00002-of-00010.safetensors
-# 4cc2d059fded71efd2947a414f32053b4ed3fa84383edf97b6d91fd9f04e4235 - model-00003-of-00010.safetensors
+# f4ee40f3b260372082ee0cb2aff1dcdbbe310322651a6ad36327536cdcdf3f40 - model-00001-of-00037.safetensors
+# f597885404ed877706e6b78aa14147002169549c6e6a2e344ca4132365464be0 - model-00002-of-00037.safetensors
+# 482d4ff5fca9e5be7bc4285d806fcb31582798f20881be23b02270baa37b1d6d - model-00003-of-00037.safetensors
+# 896add67b07b2770692df6ff84eee73ec36599c460cf77069e25c860dad18397 - model-00004-of-00037.safetensors
+# b21a29eba64b550a11276653eee792bead634d6d35dd9e42fc8c985b53fd501c - model-00005-of-00037.safetensors
 # ...
 ```
 
@@ -78,33 +80,34 @@ With the `-n` option, `git lfs ls-files` will only show the filenames.
 
 ```bash
 git lfs ls-files -n
-# consolidated.safetensors
-# model-00001-of-00010.safetensors
-# model-00002-of-00010.safetensors
-# model-00003-of-00010.safetensors
+# model-00001-of-00037.safetensors
+# model-00002-of-00037.safetensors
+# model-00003-of-00037.safetensors
+# model-00004-of-00037.safetensors
+# model-00005-of-00037.safetensors
 # ...
 
-git lfs ls-files -n | wc -l  # 13
+git lfs ls-files -n | wc -l  # 37
 ```
 
 Next, we create a list of files (`files.txt`) to download with `aria2`. We use `xargs` to generate the download URL and the output filename for the list.
 
 ```bash
-git lfs ls-files -n | xargs -d "\n" -I {} echo -e "https://huggingface.co/mistralai/Mistral-Small-24B-Instruct-2501/resolve/main/{}\n    out={}" >> files.txt
+git lfs ls-files -n | xargs -d "\n" -I {} echo -e "https://huggingface.co/Qwen/Qwen2.5-72B/resolve/main/{}\n    out={}" >> files.txt
 
 head files.txt
-# https://huggingface.co/mistralai/Mistral-Small-24B-Instruct-2501/resolve/main/consolidated.safetensors
-#     out=consolidated.safetensors
-# https://huggingface.co/mistralai/Mistral-Small-24B-Instruct-2501/resolve/main/model-00001-of-00010.safetensors
-#     out=model-00001-of-00010.safetensors
-# https://huggingface.co/mistralai/Mistral-Small-24B-Instruct-2501/resolve/main/model-00002-of-00010.safetensors
-#     out=model-00002-of-00010.safetensors
-# https://huggingface.co/mistralai/Mistral-Small-24B-Instruct-2501/resolve/main/model-00003-of-00010.safetensors
-#     out=model-00003-of-00010.safetensors
-# https://huggingface.co/mistralai/Mistral-Small-24B-Instruct-2501/resolve/main/model-00004-of-00010.safetensors
-#     out=model-00004-of-00010.safetensors
+# https://huggingface.co/Qwen/Qwen2.5-72B/resolve/main/model-00001-of-00037.safetensors
+#     out=model-00001-of-00037.safetensors
+# https://huggingface.co/Qwen/Qwen2.5-72B/resolve/main/model-00002-of-00037.safetensors
+#     out=model-00002-of-00037.safetensors
+# https://huggingface.co/Qwen/Qwen2.5-72B/resolve/main/model-00003-of-00037.safetensors
+#     out=model-00003-of-00037.safetensors
+# https://huggingface.co/Qwen/Qwen2.5-72B/resolve/main/model-00004-of-00037.safetensors
+#     out=model-00004-of-00037.safetensors
+# https://huggingface.co/Qwen/Qwen2.5-72B/resolve/main/model-00005-of-00037.safetensors
+#     out=model-00005-of-00037.safetensors
 
-wc -l files.txt  # 26 files.txt
+wc -l files.txt  # 74 files.txt
 ```
 
 Before downloading the files, we need to remove the files that are already in the directory. Otherwise, `aria2` will add a suffix to the downloaded files.
@@ -136,52 +139,42 @@ First, we create files to store the expected SHA256 hashes for each file.
 ```bash
 git lfs ls-files -l | awk '{print $1 "  " $3 > $3".sha256"}'
 
-wc -l *.sha256  # 13 total
+find . -name "*.sha256" -print | wc -l  # 37
 
-cat model-00001-of-00010.safetensors.sha256
-# 75a14c708eea501700a723dc74bc886cf36a1393686a3fb098ee106b160da32f  model-00001-of-00010.safetensors
+cat model-00001-of-00037.safetensors.sha256
+# f4ee40f3b260372082ee0cb2aff1dcdbbe310322651a6ad36327536cdcdf3f40  model-00001-of-00037.safetensors
 ```
 
-Let's compute the SHA256 hash of a first file using the `sha256sum` command and measure how long it takes.
+Let's compute the SHA256 hash of a first file using the `sha256sum` command.
 
 ```bash
-time sha256sum model-00001-of-00010.safetensors
-# 75a14c708eea501700a723dc74bc886cf36a1393686a3fb098ee106b160da32f  model-00001-of-00010.safetensors
-#
-# real    0m4.073s
-# user    0m3.373s
-# sys     0m0.692s
+sha256sum model-00001-of-00037.safetensors
+# f4ee40f3b260372082ee0cb2aff1dcdbbe310322651a6ad36327536cdcdf3f40  model-00001-of-00037.safetensors
 ```
 
-It takes about 4 seconds to compute the SHA256 hash for a single file. We can speed up the process by using GNU Parallel (`parallel` command) to compute the hashes in parallel using multiple CPU cores. The `-j` option specifies the number of parallel jobs to run. You can set it to the number of CPU cores on your system. In Linux, you can use the `nproc` command to find out the number of CPU cores.
+We can speed up the process by using GNU Parallel (`parallel` command) to compute the hashes in parallel using multiple CPU cores. The `-j` option specifies the number of parallel jobs to run. You can set it to the number of CPU cores on your system. In Linux, you can use the `nproc` command to find out the number of CPU cores.
 
 ```bash
-time find . -name "*.sha256" | sort | parallel -j 8 -u "sha256sum -c {} 2>&1" | tee sha256sum.log
-# model-00005-of-00010.safetensors: OK
-# model-00003-of-00010.safetensors: OK
-# model-00002-of-00010.safetensors: OK
+time find . -name "*.sha256" -print | sort | parallel -j 8 -u "sha256sum -c {} 2>&1" | tee sha256sum.log
+# model-00001-of-00037.safetensors: OK
+# model-00007-of-00037.safetensors: OK
+# model-00003-of-00037.safetensors: OK
 # ...
 ```
 
 Let's check the contents of the file `sha256sum.log`. It should contain the results of the SHA256 hash verification for each file. The `OK` message indicates that the hash verification was successful.
 
 ```bash
-wc -l sha256sum.log  # 13 sha256sum.log
+wc -l sha256sum.log  # 37 sha256sum.log
 
 sort sha256sum.log | nl
-#      1  consolidated.safetensors: OK
-#      2  model-00001-of-00010.safetensors: OK
-#      3  model-00002-of-00010.safetensors: OK
-#      4  model-00003-of-00010.safetensors: OK
-#      5  model-00004-of-00010.safetensors: OK
-#      6  model-00005-of-00010.safetensors: OK
-#      7  model-00006-of-00010.safetensors: OK
-#      8  model-00007-of-00010.safetensors: OK
-#      9  model-00008-of-00010.safetensors: OK
-#     10  model-00009-of-00010.safetensors: OK
-#     11  model-00010-of-00010.safetensors: OK
-#     12  tekken.json: OK
-#     13  tokenizer.json: OK
+#      1  model-00001-of-00037.safetensors: OK
+#      2  model-00002-of-00037.safetensors: OK
+#      3  model-00003-of-00037.safetensors: OK
+# ...
+#     35  model-00035-of-00037.safetensors: OK
+#     36  model-00036-of-00037.safetensors: OK
+#     37  model-00037-of-00037.safetensors: OK
 ```
 
 OK! All the files have been successfully downloaded and verified!
