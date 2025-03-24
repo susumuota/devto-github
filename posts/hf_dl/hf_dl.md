@@ -55,24 +55,24 @@ conda install conda-forge::git-lfs conda-forge::aria2 conda-forge::parallel -y
 
 ## Downloading Hugging Face Models
 
-In this section, we will see how to download Hugging Face models (e.g. `Qwen/Qwen2.5-72B`) using `aria2`.
+In this section, we will see how to download Hugging Face models (e.g. `Qwen/Qwen2.5-72B-Instruct`) using `aria2`.
 
 First, let's clone a Hugging Face repository using `git`. To avoid downloading the large files, we set the `GIT_LFS_SKIP_SMUDGE` environment variable to `1`.
 
 ```bash
-GIT_LFS_SKIP_SMUDGE=1 git clone https://huggingface.co/Qwen/Qwen2.5-72B
-cd Qwen2.5-72B
+GIT_LFS_SKIP_SMUDGE=1 git clone https://huggingface.co/Qwen/Qwen2.5-72B-Instruct
+cd Qwen2.5-72B-Instruct
 ```
 
 The `git lfs ls-files` command lists the files tracked by `git-lfs`. With the `-l` option it will show the OID (SHA256 hash) and the filename. We will use this information to download the files using `aria2` and to verify the SHA256 hashes.
 
 ```bash
 git lfs ls-files -l
-# f4ee40f3b260372082ee0cb2aff1dcdbbe310322651a6ad36327536cdcdf3f40 - model-00001-of-00037.safetensors
-# f597885404ed877706e6b78aa14147002169549c6e6a2e344ca4132365464be0 - model-00002-of-00037.safetensors
-# 482d4ff5fca9e5be7bc4285d806fcb31582798f20881be23b02270baa37b1d6d - model-00003-of-00037.safetensors
-# 896add67b07b2770692df6ff84eee73ec36599c460cf77069e25c860dad18397 - model-00004-of-00037.safetensors
-# b21a29eba64b550a11276653eee792bead634d6d35dd9e42fc8c985b53fd501c - model-00005-of-00037.safetensors
+# 18d5d2b73010054d1c9fc4a1ba777d575e871b10f1155f3ae22481b7752bc425 - model-00001-of-00037.safetensors
+# 802a3abf41ccdeb01931c5e40eb177ea114a1c47f68cb251d75c2de0fe196677 - model-00002-of-00037.safetensors
+# c3a2ab093723d4981dcc6b20c7f48c444ccd9d8572b59f0bf7caa632715b7d36 - model-00003-of-00037.safetensors
+# 5f35d5475cc4730ca9a38f958f74b5322d28acbd4aec30560987ed12e2748d8f - model-00004-of-00037.safetensors
+# b7f066aef57e0fe29b516ef743fec7a90518151bd5a9df19263dfdee214dfe4d - model-00005-of-00037.safetensors
 # ...
 ```
 
@@ -93,18 +93,18 @@ git lfs ls-files -n | wc -l  # 37
 Next, we create a list of files (`files.txt`) to download with `aria2`. We use `xargs` to generate the download URL and the output filename for the list.
 
 ```bash
-git lfs ls-files -n | xargs -d "\n" -I {} echo -e "https://huggingface.co/Qwen/Qwen2.5-72B/resolve/main/{}\n    out={}" >> files.txt
+git lfs ls-files -n | xargs -d "\n" -I {} echo -e "https://huggingface.co/Qwen/Qwen2.5-72B-Instruct/resolve/main/{}\n    out={}" >> files.txt
 
 head files.txt
-# https://huggingface.co/Qwen/Qwen2.5-72B/resolve/main/model-00001-of-00037.safetensors
+# https://huggingface.co/Qwen/Qwen2.5-72B-Instruct/resolve/main/model-00001-of-00037.safetensors
 #     out=model-00001-of-00037.safetensors
-# https://huggingface.co/Qwen/Qwen2.5-72B/resolve/main/model-00002-of-00037.safetensors
+# https://huggingface.co/Qwen/Qwen2.5-72B-Instruct/resolve/main/model-00002-of-00037.safetensors
 #     out=model-00002-of-00037.safetensors
-# https://huggingface.co/Qwen/Qwen2.5-72B/resolve/main/model-00003-of-00037.safetensors
+# https://huggingface.co/Qwen/Qwen2.5-72B-Instruct/resolve/main/model-00003-of-00037.safetensors
 #     out=model-00003-of-00037.safetensors
-# https://huggingface.co/Qwen/Qwen2.5-72B/resolve/main/model-00004-of-00037.safetensors
+# https://huggingface.co/Qwen/Qwen2.5-72B-Instruct/resolve/main/model-00004-of-00037.safetensors
 #     out=model-00004-of-00037.safetensors
-# https://huggingface.co/Qwen/Qwen2.5-72B/resolve/main/model-00005-of-00037.safetensors
+# https://huggingface.co/Qwen/Qwen2.5-72B-Instruct/resolve/main/model-00005-of-00037.safetensors
 #     out=model-00005-of-00037.safetensors
 
 wc -l files.txt  # 74 files.txt
@@ -142,14 +142,14 @@ git lfs ls-files -l | awk '{print $1 "  " $3 > $3".sha256"}'
 find . -name "*.sha256" -print | wc -l  # 37
 
 cat model-00001-of-00037.safetensors.sha256
-# f4ee40f3b260372082ee0cb2aff1dcdbbe310322651a6ad36327536cdcdf3f40  model-00001-of-00037.safetensors
+# 18d5d2b73010054d1c9fc4a1ba777d575e871b10f1155f3ae22481b7752bc425  model-00001-of-00037.safetensors
 ```
 
 Let's compute the SHA256 hash of a first file using the `sha256sum` command.
 
 ```bash
 sha256sum model-00001-of-00037.safetensors
-# f4ee40f3b260372082ee0cb2aff1dcdbbe310322651a6ad36327536cdcdf3f40  model-00001-of-00037.safetensors
+# 18d5d2b73010054d1c9fc4a1ba777d575e871b10f1155f3ae22481b7752bc425  model-00001-of-00037.safetensors
 ```
 
 We can speed up the process by using GNU Parallel (`parallel` command) to compute the hashes in parallel using multiple CPU cores. The `-j` option specifies the number of parallel jobs to run. You can set it to the number of CPU cores on your system. In Linux, you can use the `nproc` command to find out the number of CPU cores.
